@@ -1,0 +1,40 @@
+{
+  "name": "mdreader",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@fontsource-variable/dm-sans": "^5.2.8",
+    "@fontsource/instrument-serif": "^5.2.7",
+    "@lezer/highlight": "^1.2.5",
+    "diff": "^8.0.4",
+    "dompurify": "^3.4.17",
+    "es-module-lexer": "^3.0.5",
+    "fflate": "^0.8.2",
+    "idb-keyval": "^6.2.2",
+    "katex": "^0.16.28",
+    "lucide-react": "^0.577.0",
+    "marked": "^14.1.2",
+    "parse5": "^8.0.0",
+    "pdfjs-dist": "^4.10.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.6",
+    "vite-plugin-singlefile": "^2.3.4"
+  }
+}
