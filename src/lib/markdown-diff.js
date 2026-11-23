@@ -2,6 +2,7 @@ import { diffArrays, diffWordsWithSpace } from 'diff';
 import { renderMarkdown, slugify } from './markdown.js';
 import { findAnchor, hydrateMarkdown } from './reader.js';
 import { viewURL } from './location.js';
+import { notebookFiles } from './paths.js';
 
 const OLD_HEADING_PREFIX = 'comparison-from-';
 const atomic = '.md-embed, img, .katex, .code-wrap, .code-fallback, .fnref, .footnotes, input';
@@ -162,8 +163,9 @@ export function mountMarkdownDiff(root, before, after, { repo, path, fields, sco
 
   function navigation(snapshot, isOld) {
     const href = (file, anchor) => viewURL(repo, snapshot, file, anchor).href;
+    const files = notebookFiles(snapshot.files);
     return {
-      access: { files: snapshot.files, has: file => snapshot.files.has(file), read: file => repo.bytes(snapshot, file) },
+      access: { files, has: file => files.has(file), read: file => repo.bytes(snapshot, file) },
       href,
       open(file, anchor) {
         const target = file === path && anchor &&

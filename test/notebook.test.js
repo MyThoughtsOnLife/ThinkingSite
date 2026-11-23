@@ -3,6 +3,7 @@ import test from 'node:test';
 import { describeNote, searchCatalog, tagQuery } from '../src/lib/catalog.js';
 import { asBytes } from '../src/lib/drafts.js';
 import { extractFrontmatter, setNoteTags } from '../src/lib/frontmatter.js';
+import { notebookFiles } from '../src/lib/paths.js';
 import { ageOn, civilDate, readProfile } from '../src/lib/publication.js';
 import { compareSources, revisionSource } from '../src/lib/revision-diff.js';
 
@@ -76,4 +77,13 @@ test('diff represents added, changed, unchanged and deleted lines with separate 
   };
   assert.equal((await revisionSource(repo, 'latest', 'README.md')).source, 'One\n');
   assert.equal((await revisionSource(repo, 'old', 'README.md')).source, null);
+});
+
+
+test('hides dotfiles, dotfolders and the root README without changing the workspace files', () => {
+  const paths = ['.gitignore', '.mdreader.json', '.github/workflows/site.yml', 'notes/.draft.md',
+    'notes/.private/page.md', 'Readme.md', 'notes/README.md', 'notes/Entry.md', 'About.md'];
+  const files = new Map(paths.map(path => [path, {}]));
+  assert.deepEqual([...notebookFiles(files).keys()], ['notes/README.md', 'notes/Entry.md', 'About.md']);
+  assert.deepEqual([...files.keys()], paths);
 });

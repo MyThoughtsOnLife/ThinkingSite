@@ -85,10 +85,12 @@ export function resolvePath(files, target, current, wiki = false) {
   return null;
 }
 
-export const isRootReadme = path => /^readme(?:\.[^/]+)?$/i.test(path);
+export function isHiddenNotebookPath(path) {
+  return /^readme(?:\.[^/]+)?$/i.test(path) || path.split('/').some(part => part.startsWith('.'));
+}
 
-export function withoutRootReadme(files) {
-  return new Map([...files].filter(([path]) => !isRootReadme(path)));
+export function notebookFiles(files) {
+  return new Map([...files].filter(([path]) => !isHiddenNotebookPath(path)));
 }
 
 export function preferredFile(files) {

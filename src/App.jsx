@@ -10,7 +10,7 @@ import { aboutFile, ageOn, displayDay, localDay, readProfile } from './lib/publi
 import { localWorkspace } from './data/workspaces.js';
 import { applyDraft, asText, download, exportZip, readDraft, readFile, saveDraft } from './lib/drafts.js';
 import { copyURL, locationChoice, viewURL } from './lib/location.js';
-import { baseName, dirName, fileKind, isRootReadme, parentFolders, pathConflict, preferredFile, withoutRootReadme, resolvePath, validatePath } from './lib/paths.js';
+import { baseName, dirName, fileKind, isHiddenNotebookPath, parentFolders, pathConflict, preferredFile, notebookFiles, resolvePath, validatePath } from './lib/paths.js';
 import { openRepository } from './lib/repository.js';
 import { EmptyContent, ReadView, Writer } from './components/Content.jsx';
 import { ImportDialog, InputDialog, LibraryDialog, RemoveDialog } from './components/Dialogs.jsx';
@@ -136,7 +136,7 @@ export default function App() {
   const latest = !repo || revision.id === repo.latest.id;
   const overlay = latest ? changes : EMPTY_DRAFT;
   const files = useMemo(() => applyDraft(revision?.files || EMPTY_DRAFT, overlay), [revision, overlay]);
-  const browsingFiles = useMemo(() => mode === 'read' && repo?.provider !== 'Local' ? withoutRootReadme(files) : files,
+  const browsingFiles = useMemo(() => mode === 'read' && repo?.provider !== 'Local' ? notebookFiles(files) : files,
     [files, mode, repo]);
   const exists = Boolean(path) && browsingFiles.has(path);
   const about = useMemo(() => aboutFile(files), [files]);
@@ -189,10 +189,10 @@ export default function App() {
     if (id !== sequence.current) return;
     const snapshot = selected || next.latest;
     const workspaceFiles = applyDraft(snapshot.files, selected ? EMPTY_DRAFT : draft);
-    const tree = next.provider === 'Local' ? workspaceFiles : withoutRootReadme(workspaceFiles);
+    const tree = next.provider === 'Local' ? workspaceFiles : notebookFiles(workspaceFiles);
     const requestedPath = choice.path || next.initialPath || '';
-    const hiddenReadme = next.provider !== 'Local' && isRootReadme(requestedPath);
-    const target = hiddenReadme ? '' : requestedPath;
+    const hiddenPath = next.provider !== 'Local' && isHiddenNotebookPath(requestedPath);
+    const target = hiddenPath ? '' : requestedPath;
     const directory = target ? new Map([...tree].filter(([file]) => file.startsWith(target + '/'))) : null;
     const nextPath = target && (tree.has(target) || selected) ? target :
       (target && (resolvePath(tree, '/' + target.split('/').map(encodeURIComponent).join('/'), '')?.path || preferredFile(directory))) ||
@@ -206,7 +206,7 @@ export default function App() {
     setRevision(snapshot);
     setComparing(false);
     setPath(nextPath);
-    setAnchor(hiddenReadme ? '' : choice.anchor || next.anchor || '');
+    setAnchor(hiddenPath ? '' : choice.anchor || next.anchor || '');
     setExpanded(new Set(parentFolders(nextPath)));
     setMode(next.provider === 'Local' ? 'edit' : 'read');
     setMobilePanel('');
@@ -369,11 +369,11 @@ export default function App() {
       setRevision(snapshot);
       setMode('read');
       setMobilePanel('');
-      if (isRootReadme(path)) {
+      if (isHiddenNotebookPath(path)) {
         setPath('');
         setAnchor('');
       } else if (!path) {
-        setPath(preferredFile(withoutRootReadme(snapshot.files)));
+        setPath(preferredFile(notebookFiles(snapshot.files)));
       }
     } catch (error) {
       if (token === sequence.current) report(error.message);
@@ -403,7 +403,7 @@ export default function App() {
       }
       setComparing(false);
       setMode(repo.provider === 'Local' ? 'edit' : 'read');
-      if (repo.provider !== 'Local' && isRootReadme(choice.path)) openFile('', '', false);
+      if (repo.provider !== 'Local' && isHiddenNotebookPath(choice.path)) openFile('', '', false);
       else openFile(choice.path, choice.anchor, false);
     } catch (error) {
       if (token === sequence.current) report(error.message);
@@ -543,7 +543,7 @@ export default function App() {
               }}><SquarePen size={17} /><span>Edit</span></button>
               : <button type="button" className="button top-mode" aria-label="Read" title="Return to reading" onClick={() => {
                 setComparing(false);
-                if (repo.provider !== 'Local' && isRootReadme(path)) openHome();
+                if (repo.provider !== 'Local' && isHiddenNotebookPath(path)) openHome();
                 else setMode('read');
               }}><BookOpen size={17} /><span>Read</span></button>}
             <button type="button" className={'button export-button ' + (mode === 'edit' ? 'primary' : 'icon-only')} disabled={Boolean(exporting) || !files.size || versionLoading}
