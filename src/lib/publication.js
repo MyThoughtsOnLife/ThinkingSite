@@ -1,10 +1,13 @@
-const isoDate = /^(\d{4})-(\d{2})-(\d{2})$/;
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+const dottedDate = /^(\d{2})\.(\d{2})\.(\d{4})$/;
 const dateFormatter = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 export function civilDate(value) {
-  if (typeof value !== 'string' || !isoDate.test(value)) return '';
-  const date = new Date(value + 'T00:00:00Z');
-  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? '' : value;
+  if (typeof value !== 'string') return '';
+  const normalized = value.trim().replace(dottedDate, '$3-$2-$1');
+  if (!isoDate.test(normalized)) return '';
+  const date = new Date(normalized + 'T00:00:00Z');
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalized ? '' : normalized;
 }
 
 export function localDay(date = new Date()) {

@@ -6,7 +6,7 @@ A personal Markdown notebook for `mythoughtsonlife.com`. MdReader loads public c
 
 1. The site opens [MyThoughtsOnLife/Thoughts](https://github.com/MyThoughtsOnLife/Thoughts) by default. In `src/data/collections.js`, set `primaryCollection.ref` to open a specific branch or tag.
 2. Add guest notebooks to the `collections` array using `{ name, description, url }`. Readers can also paste a public repository or file link in the collection picker.
-3. To enable age displays, set `primaryCollection.author` or add the following optional file at the root of the **content repository**. This example uses a fictional author and date. The birth date is public when supplied through either configuration route.
+3. To enable age displays, set `primaryCollection.author` or add the following optional file at the root of the **content repository**. This example uses a fictional author and date. Use `YYYY-MM-DD` or `DD.MM.YYYY` for the birth date. The birth date is public when supplied through either configuration route.
 
 ```json
 {
@@ -23,7 +23,7 @@ Save this file as `.mdreader.json`. Repository metadata overrides the settings f
 
 ## Write and browse
 
-The root README is hidden from the published notebook and remains available in **Edit** and ZIP exports. Put `about.md` at the root of the content repository to enable the **About** link. Use `{{date}}` and `{{age}}` in its prose to display today's date and the author's age. The age field shows a dash until a valid birth date is available. These fields are plain text and stay literal in code blocks and inline code.
+The root README is hidden from the published notebook and remains available in **Edit** and ZIP exports. Put `about.md` at the root of the content repository to enable the **About** link. Use `{{ Date }}` and `{{ Age }}` in its prose to display today's date and the author's age. Capitalization is optional. The age field shows a dash until a valid birth date is available. These fields are plain text and stay literal in code blocks and inline code.
 
 Use YAML frontmatter to organize notes:
 

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { describeNote, searchCatalog, tagQuery } from '../src/lib/catalog.js';
 import { asBytes } from '../src/lib/drafts.js';
 import { extractFrontmatter, setNoteTags } from '../src/lib/frontmatter.js';
-import { ageOn, readProfile } from '../src/lib/publication.js';
+import { ageOn, civilDate, readProfile } from '../src/lib/publication.js';
 import { compareSources, revisionSource } from '../src/lib/revision-diff.js';
 
 test('calculates age from the civil date of the commit across birthdays', () => {
@@ -13,6 +13,16 @@ test('calculates age from the civil date of the commit across birthdays', () => 
   assert.equal(ageOn('2000-02-29', '2025-03-01'), 25);
   assert.equal(ageOn('2001-02-29', '2026-11-22'), null);
   assert.equal(ageOn('2026-11-23', '2026-11-22'), null);
+});
+
+test('accepts dotted civil dates in author profiles and rejects invalid days', () => {
+  const defaults = { author: { birthDate: ' 22.11.2001 ' } };
+  assert.equal(readProfile(defaults).author.birthDate, '2001-11-22');
+  assert.equal(readProfile(defaults, '{"author":{"birthDate":"12.03.2002"}}').author.birthDate, '2002-03-12');
+  assert.equal(ageOn('22.11.2001', '2026-11-21T23:45:00-07:00'), 24);
+  assert.equal(ageOn('22.11.2001', '2026-11-22'), 25);
+  assert.equal(civilDate('31.04.2026'), '');
+  assert.equal(civilDate('29.02.2024'), '2024-02-29');
 });
 
 test('loads repository-specific published metadata and falls back to valid configured values', () => {

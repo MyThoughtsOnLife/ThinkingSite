@@ -526,7 +526,7 @@ function fillFields(root, fields) {
   while (walker.nextNode()) {
     const node = walker.currentNode;
     if (!node.parentElement?.closest('code, pre, script, style')) {
-      node.data = node.data.replace(/\{\{\s*(date|age)\s*\}\}/g, (_, key) => fields[key]);
+      node.data = node.data.replace(/\{\{\s*(date|age)\s*\}\}/gi, (_, key) => fields[key.toLowerCase()]);
     }
   }
 }
